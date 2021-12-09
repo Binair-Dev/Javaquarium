@@ -67,9 +67,9 @@ public class Aquarium
 
     private void UpdateSexe()
     {
-        for(Object obj : this.GetPoissons().toArray())
+        for(int i  = 0; i < GetPoissons().size(); i++)
         {
-            Poisson poisson = (Poisson)obj;
+            Poisson poisson = GetPoissons().get(i);
             if(poisson.GetSexualite() == Sexualite.HERMAPHRODITE_AGE)
             {
                 if(poisson.GetAge() == 10)
@@ -92,21 +92,22 @@ public class Aquarium
 
     private void Reproduire()
     {
-        for(Object obj : this.GetAlgues().toArray())
+        int size = GetAlgues().size();
+        for(int i = 0; i < size; i++)
         {
-            Algue algue = (Algue) obj;
-            if (GetAlgues().size() < max_algue)
+            Algue algue = GetAlgues().get(i);
+            if (algue.GetPointDeVie() >= 10)
             {
-                if (algue.GetPointDeVie() >= 10)
+                if (GetAlgues().size() < max_algue)
                 {
                     algue.RemovePointDeVie(5);
                     this.AjouterAlgue(new Algue(5));
                 }
             }
         }
-        for(Object obj : this.GetPoissons().toArray())
+        for(int i  = 0; i < GetPoissons().size(); i++)
         {
-            Poisson poisson = (Poisson) obj;
+            Poisson poisson = GetPoissons().get(i);
             if(this.GetPoissons().size() < max_poisson)
             {
                 if (poisson.GetPointDeVie() >= 5)
@@ -271,9 +272,9 @@ public class Aquarium
     private void Manger()
     {
         List<Poisson> poissons = new ArrayList<Poisson>();
-        for(Object obj : this.GetPoissons().toArray())
+        for(int i  = 0; i < GetPoissons().size(); i++)
         {
-            Poisson p = (Poisson) obj;
+            Poisson p = GetPoissons().get(i);
             if (!poissons.contains(p) && p.GetPointDeVie() <= 5)
             {
                 if (p instanceof Carnivores)
@@ -322,18 +323,18 @@ public class Aquarium
 
     private void updateAlgueLife()
     {
-        for(Object obj : this.GetAlgues().toArray())
+        for(int i = 0; i < GetAlgues().size(); i++)
         {
-            Algue algue = (Algue)obj;
+            Algue algue = GetAlgues().get(i);
             algue.AjouterPointDeVie(1);
         }
     }
 
     private void updateFishLife()
     {
-        for(Object obj : this.GetPoissons().toArray())
+        for(int i  = 0; i < GetPoissons().size(); i++)
         {
-            Poisson poisson = (Poisson)obj;
+            Poisson poisson = GetPoissons().get(i);
             poisson.RemovePointDeVie(1);
         }
     }
@@ -374,9 +375,9 @@ public class Aquarium
     }
     private void updateFishAge()
     {
-        for(Object obj : this.GetPoissons().toArray())
+        for(int i  = 0; i < GetPoissons().size(); i++)
         {
-            Poisson poisson = (Poisson) obj;
+            Poisson poisson = GetPoissons().get(i);
             poisson.AddAge();
         }
     }
