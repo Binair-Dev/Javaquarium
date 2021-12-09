@@ -26,7 +26,7 @@ public class Carnivores extends Poisson {
     }
     public boolean Manger(Poisson poisson, Aquarium aquarium)
     {
-        if (aquarium.Pourcentage(30))
+        if (aquarium.Pourcentage(65))
         {
             if (aquarium.getPoissonByName(poisson.getNom()) != null) {
                 aquarium.RetirerPoisson(poisson);

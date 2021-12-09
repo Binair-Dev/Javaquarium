@@ -112,7 +112,7 @@ public class Aquarium
             Poisson poisson = GetPoissons().get(i);
             if(this.GetPoissons().size() < max_poisson)
             {
-                if (poisson.GetPointDeVie() >= 5)
+                if (poisson.GetPointDeVie() >= 5 && poisson.GetPointDeVie() < 15)
                 {
                     if (poisson instanceof Carnivores)
                     {
@@ -124,55 +124,53 @@ public class Aquarium
                             if (carnivores.getRace().equals(carnivoresChoosen.getRace()) && !carnivores.equals(carnivoresChoosen))
                             {
                                 if(!carnivoresChoosen.isReproducted() && !carnivores.isReproducted()) {
-                                    if((carnivores.getAge() > 3 && carnivoresChoosen.getAge() > 3)) {
-                                        carnivores.setReproducted(true);
-                                        carnivoresChoosen.setReproducted(true);
-                                        int sx = new Random().nextInt(10);
-                                        int sexualite = new Random().nextInt(3);
-                                        Sexe sexe = sx >= 5 ? Sexe.MALE : Sexe.FEMELLE;
-                                        Sexualite sexualite1 = Sexualite.MONOSEXUE;
-                                        switch (sexualite)
+                                    carnivores.setReproducted(true);
+                                    carnivoresChoosen.setReproducted(true);
+                                    int sx = new Random().nextInt(10);
+                                    int sexualite = new Random().nextInt(3);
+                                    Sexe sexe = sx >= 5 ? Sexe.MALE : Sexe.FEMELLE;
+                                    Sexualite sexualite1 = Sexualite.MONOSEXUE;
+                                    switch (sexualite)
+                                    {
+                                        case 1:
+                                            sexualite1 = Sexualite.MONOSEXUE;
+                                            break;
+                                        case 2:
+                                            sexualite1 = Sexualite.HERMAPHRODITE_AGE;
+                                            break;
+                                        case 3:
+                                            sexualite1 = Sexualite.HERMAPHRODITE_OPPORTUNISTE;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    if (carnivores.getSexe() != carnivoresChoosen.getSexe())
+                                    {
+                                        Poisson p = new Carnivores(GlobalUtils.generateRandomName(), sexe, carnivores.getRace(), sexualite1);
+                                        this.GetPoissons().add(p);
+                                        System.out.println(ConsoleColor.CYAN + carnivores.getNom() + " vient d'avoir une bébé avec " + carnivoresChoosen.getNom() + " du nom de: " + p.getNom() + ConsoleColor.RESET);
+                                        try {
+                                            Thread.sleep(200);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        switch (carnivoresChoosen.getSexe().toString())
                                         {
-                                            case 1:
-                                                sexualite1 = Sexualite.MONOSEXUE;
+                                            case "MALE":
+                                                carnivores.setSexe(Sexe.FEMELLE);
                                                 break;
-                                            case 2:
-                                                sexualite1 = Sexualite.HERMAPHRODITE_AGE;
-                                                break;
-                                            case 3:
-                                                sexualite1 = Sexualite.HERMAPHRODITE_OPPORTUNISTE;
+                                            case "FEMELLE":
+                                                carnivores.setSexe(Sexe.MALE);
                                                 break;
                                             default:
                                                 break;
                                         }
-                                        if (carnivores.getSexe() != carnivoresChoosen.getSexe())
-                                        {
-                                            Poisson p = new Carnivores(GlobalUtils.generateRandomName(), sexe, carnivores.getRace(), sexualite1);
-                                            this.GetPoissons().add(p);
-                                            System.out.println(ConsoleColor.CYAN + carnivores.getNom() + " vient d'avoir une bébé avec " + carnivoresChoosen.getNom() + " du nom de: " + p.getNom() + ConsoleColor.RESET);
-                                            try {
-                                                Thread.sleep(200);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                        else
-                                        {
-                                            switch (carnivoresChoosen.getSexe().toString())
-                                            {
-                                                case "MALE":
-                                                    carnivores.setSexe(Sexe.FEMELLE);
-                                                    break;
-                                                case "FEMELLE":
-                                                    carnivores.setSexe(Sexe.MALE);
-                                                    break;
-                                                default:
-                                                    break;
-                                            }
-                                            Poisson p = new Carnivores(GlobalUtils.generateRandomName(), sexe, carnivores.getRace(), sexualite1);
-                                            this.GetPoissons().add(p);
-                                            System.out.println(carnivores.getNom() + " vient d'avoir une bébé avec " + carnivoresChoosen.getNom() + " du nom de: " + p.getNom());
-                                        }
+                                        Poisson p = new Carnivores(GlobalUtils.generateRandomName(), sexe, carnivores.getRace(), sexualite1);
+                                        this.GetPoissons().add(p);
+                                        System.out.println(carnivores.getNom() + " vient d'avoir une bébé avec " + carnivoresChoosen.getNom() + " du nom de: " + p.getNom());
                                     }
                                 }
                             }
@@ -261,19 +259,24 @@ public class Aquarium
     public void LogInformations()
     {
         if(Main.isDebugMode) {
+            int car = 0;
+            int herb = 0;
             for(Object obj : poissons.toArray()) {
                 Poisson poisson = (Poisson) obj;
                 poisson.setReproducted(false);
                 System.out.print(ConsoleColor.GREEN_BRIGHT + "Nom: " + poisson.getNom() + " | Vie:" + poisson.getPointDeVie() + " | Age:" + poisson.getAge());
                 if(poisson instanceof Carnivores) {
+                    car++;
                     Carnivores c = (Carnivores) poisson;
                     System.out.println(ConsoleColor.GREEN_BRIGHT + " | Race: " + c.getRace() + " | Sexe: " + c.getSexe() + ConsoleColor.RESET);
                 }
                 else {
+                    herb++;
                     Herbivores c = (Herbivores) poisson;
                     System.out.println(" | Race: " + c.getRace() + " | Sexe: " + c.getSexe());
                 }
             }
+            System.out.println(ConsoleColor.GREEN_BRIGHT + "Vous avez " + ConsoleColor. RED + car + ConsoleColor.GREEN_BRIGHT + " Poissons carnivores et " + ConsoleColor.RED + herb + ConsoleColor.GREEN_BRIGHT +" poissons herbivores" + ConsoleColor.RESET);
         }
         System.out.println(ConsoleColor.BLACK_BRIGHT + "Nombres d'algues: " + ConsoleColor.RED + this.GetAlgues().size() + ConsoleColor.RESET);
         System.out.println(ConsoleColor.BLACK_BRIGHT + "Nombres de poissons: " + ConsoleColor.RED + this.GetPoissons().size() + ConsoleColor.RESET);
@@ -287,22 +290,32 @@ public class Aquarium
             Poisson p = (Poisson) obj;
             if (p instanceof Carnivores)
             {
-                if(!GetPoissons().contains(p)) break;
-                Carnivores carnivore = ((Carnivores)p);
-                Poisson toEat = getFishToEat(carnivore);
+                if(p.getPointDeVie() <= 5) {
+                    if(!GetPoissons().contains(p)) break;
+                    Carnivores carnivore = ((Carnivores)p);
+                    Poisson toEat = getFishToEat(carnivore);
 
-                if(GetPoissons().contains(toEat)) {
-                    if(carnivore.Manger(toEat, this)) {
-                        System.out.println(ConsoleColor.RED + carnivore.getNom() + " vient de manger  " + toEat.getNom() + ConsoleColor.RESET);
-                        System.out.println(ConsoleColor.PURPLE + toEat.getNom() + " vient de mourrir !" + ConsoleColor.RESET);
+                    if(GetPoissons().contains(toEat)) {
+                        if(toEat instanceof Carnivores) {
+                            Carnivores choosed = (Carnivores) toEat;
+                            if(!carnivore.getRace().equals(choosed.getRace())) {
+                                if(carnivore.Manger(toEat, this)) {
+                                    System.out.println(ConsoleColor.RED + carnivore.getNom() + " vient de manger  " + toEat.getNom() + ConsoleColor.RESET);
+                                    System.out.println(ConsoleColor.PURPLE + toEat.getNom() + " vient de mourrir !" + ConsoleColor.RESET);
+                                }
+                                else
+                                    System.out.println(ConsoleColor.RED + carnivore.getNom() + " vient de tenter manger " + toEat.getNom() + " mais a échoué!" + ConsoleColor.RESET);
+                            }
+                            else {
+                                System.out.println(ConsoleColor.RED + carnivore.getNom() + " n'a rien trouvé a manger.." + ConsoleColor.RESET);
+                            }
+                        }
                     }
-                    else
-                        System.out.println(ConsoleColor.RED + carnivore.getNom() + " vient de tenter manger " + toEat.getNom() + " mais a échoué!" + ConsoleColor.RESET);
                 }
             }
             else
             {
-                if (this.GetAlgues().size() > 1 && getPoissonByName(p.getNom()) != null)
+                if (this.GetAlgues().size() > 1 && getPoissonByName(p.getNom()) != null && p.getPointDeVie() <= 7)
                 {
                     Herbivores herbivores = (Herbivores)p;
                     herbivores.Manger(this.GetAlgues().get(new Random().nextInt(this.GetAlgues().size())));
