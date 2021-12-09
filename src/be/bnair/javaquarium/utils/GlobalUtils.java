@@ -12,9 +12,6 @@ import javax.net.ssl.X509TrustManager;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Random;
 
 public class GlobalUtils {
@@ -27,6 +24,7 @@ public class GlobalUtils {
 
     public static void showChoices() {
         System.out.println(" ");
+        System.out.print(ConsoleColor.CYAN + "Tours: " + Main.aquarium.getTours() + " | ");
         System.out.print(ConsoleColor.CYAN + "[");
         System.out.print(ConsoleColor.RED + "1");
         System.out.print(ConsoleColor.CYAN + "] Ajouter un tour | ");

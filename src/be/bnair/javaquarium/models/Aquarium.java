@@ -40,7 +40,6 @@ public class Aquarium
         this.poissons.remove(fish);
     }
     public void AjouterAlgue(Algue algue) {
-        System.out.println("Une algue de " + algue.getAge() + "ans vient d'être ajouté a l'aquarium !");
         this.algues.add(algue);
     }
     public void RetirerAlgue(Algue algue) {
@@ -52,14 +51,15 @@ public class Aquarium
     public void AjouterTour()
     {
         tour++;
+        removeDeathFish();
+        removeDeathAlgue();
+
         UpdateSexe();
         updateAlgueLife();
         updateFishLife();
 
         Manger();
         Reproduire();
-
-        removeDeathAlgue();
         updateFishAge();
 
         LogInformations();
@@ -101,7 +101,9 @@ public class Aquarium
                 if (GetAlgues().size() < max_algue)
                 {
                     algue.RemovePointDeVie(5);
-                    this.AjouterAlgue(new Algue(5));
+                    Algue splitted = new Algue(5);
+                    splitted.RemovePointDeVie(5);
+                    this.AjouterAlgue(splitted);
                 }
             }
         }
@@ -122,7 +124,7 @@ public class Aquarium
                             if (carnivores.getRace().equals(carnivoresChoosen.getRace()) && !carnivores.equals(carnivoresChoosen))
                             {
                                 if(!carnivoresChoosen.isReproducted() && !carnivores.isReproducted()) {
-                                    if((carnivores.getAge() > 5 && carnivoresChoosen.getAge() > 5) && carnivores.getAge() < 18 && carnivoresChoosen.getAge() < 18 ) {
+                                    if((carnivores.getAge() > 3 && carnivoresChoosen.getAge() > 3)) {
                                         carnivores.setReproducted(true);
                                         carnivoresChoosen.setReproducted(true);
                                         int sx = new Random().nextInt(10);
@@ -262,7 +264,15 @@ public class Aquarium
             for(Object obj : poissons.toArray()) {
                 Poisson poisson = (Poisson) obj;
                 poisson.setReproducted(false);
-                System.out.println(ConsoleColor.GREEN_BRIGHT + "DEBUG | Nom: " + poisson.getNom() + " | Vie:" + poisson.getPointDeVie() + " | Age:" + poisson.getAge() + ConsoleColor.RESET);
+                System.out.print(ConsoleColor.GREEN_BRIGHT + "Nom: " + poisson.getNom() + " | Vie:" + poisson.getPointDeVie() + " | Age:" + poisson.getAge());
+                if(poisson instanceof Carnivores) {
+                    Carnivores c = (Carnivores) poisson;
+                    System.out.println(ConsoleColor.GREEN_BRIGHT + " | Race: " + c.getRace() + " | Sexe: " + c.getSexe() + ConsoleColor.RESET);
+                }
+                else {
+                    Herbivores c = (Herbivores) poisson;
+                    System.out.println(" | Race: " + c.getRace() + " | Sexe: " + c.getSexe());
+                }
             }
         }
         System.out.println(ConsoleColor.BLACK_BRIGHT + "Nombres d'algues: " + ConsoleColor.RED + this.GetAlgues().size() + ConsoleColor.RESET);
@@ -271,36 +281,32 @@ public class Aquarium
 
     private void Manger()
     {
-        List<Poisson> poissons = new ArrayList<Poisson>();
-        for(int i  = 0; i < GetPoissons().size(); i++)
+        for(Object obj : GetPoissons().toArray())
         {
-            Poisson p = GetPoissons().get(i);
-            if (!poissons.contains(p) && p.GetPointDeVie() <= 5)
+            if(GetPoissons().toArray().length <= 2) return;
+            Poisson p = (Poisson) obj;
+            if (p instanceof Carnivores)
             {
-                if (p instanceof Carnivores)
-                {
-                    if (this.GetPoissons().size() > 2 && getPoissonByName(p.getNom()) != null)
-                    {
-                        Carnivores carnivore = ((Carnivores)p);
-                        Poisson toEat = getFishToEat(carnivore);
-                        if(getPoissonByName(toEat.getNom())!= null) {
-                            if(carnivore.Manger(toEat, this)) {
-                                System.out.println(ConsoleColor.RED + carnivore.getNom() + " vient de manger  " + toEat.getNom() + ConsoleColor.RESET);
-                                System.out.println(ConsoleColor.PURPLE + toEat.getNom() + " vient de mourrir !" + ConsoleColor.RESET);
-                            }
-                            else
-                                System.out.println(ConsoleColor.RED + carnivore.getNom() + " vient de tenter manger " + toEat.getNom() + " mais a échoué!" + ConsoleColor.RESET);
-                        }
+                if(!GetPoissons().contains(p)) break;
+                Carnivores carnivore = ((Carnivores)p);
+                Poisson toEat = getFishToEat(carnivore);
+
+                if(GetPoissons().contains(toEat)) {
+                    if(carnivore.Manger(toEat, this)) {
+                        System.out.println(ConsoleColor.RED + carnivore.getNom() + " vient de manger  " + toEat.getNom() + ConsoleColor.RESET);
+                        System.out.println(ConsoleColor.PURPLE + toEat.getNom() + " vient de mourrir !" + ConsoleColor.RESET);
                     }
+                    else
+                        System.out.println(ConsoleColor.RED + carnivore.getNom() + " vient de tenter manger " + toEat.getNom() + " mais a échoué!" + ConsoleColor.RESET);
                 }
-                else
+            }
+            else
+            {
+                if (this.GetAlgues().size() > 1 && getPoissonByName(p.getNom()) != null)
                 {
-                    if (this.GetAlgues().size() > 1 && getPoissonByName(p.getNom()) != null)
-                    {
-                        Herbivores herbivores = (Herbivores)p;
-                        herbivores.Manger(this.GetAlgues().get(new Random().nextInt(this.GetAlgues().size())));
-                        System.out.println(ConsoleColor.GREEN + herbivores.getNom() + " vient de manger un morceau algue" + ConsoleColor.RESET);
-                    }
+                    Herbivores herbivores = (Herbivores)p;
+                    herbivores.Manger(this.GetAlgues().get(new Random().nextInt(this.GetAlgues().size())));
+                    System.out.println(ConsoleColor.GREEN + herbivores.getNom() + " vient de manger un morceau algue" + ConsoleColor.RESET);
                 }
             }
         }
@@ -341,12 +347,25 @@ public class Aquarium
 
     private void removeDeathAlgue()
     {
-        for(Object obj: this.GetAlgues().toArray())
+        for(int i = 0; i < GetAlgues().size(); i++)
         {
-            Algue algue = (Algue)obj;
+            Algue algue = GetAlgues().get(i);
             if (!(algue.isAlive()))
             {
-                this.GetAlgues().remove(algue);
+                this.GetAlgues().remove(i);
+            }
+        }
+    }
+
+    private void removeDeathFish()
+    {
+        for(int i = 0; i < GetPoissons().size(); i++)
+        {
+            Poisson poisson = GetPoissons().get(i);
+            if (!poisson.isAlive())
+            {
+                System.out.println(ConsoleColor.PURPLE_BRIGHT + "Le poisson " + poisson.getNom() + " vient de mourrir !" + ConsoleColor.RESET);
+                this.GetPoissons().remove(i);
             }
         }
     }
@@ -354,22 +373,18 @@ public class Aquarium
     public Poisson getFishToEat(Carnivores poisson)
     {
         Poisson choosen = null;
-        boolean isGood = false;
-        while (!isGood)
+        choosen = this.GetPoissons().get(new Random().nextInt(this.GetPoissons().size()));
+        if (choosen instanceof Carnivores)
         {
-            choosen = this.GetPoissons().get(new Random().nextInt(this.GetPoissons().size()));
-            if (choosen instanceof Carnivores)
+            Carnivores c = (Carnivores)choosen;
+            if (poisson.getRace() != c.getRace() && poisson != choosen)
             {
-                Carnivores c = (Carnivores)choosen;
-                if (poisson.getRace() != c.getRace() && poisson != choosen)
-                {
-                    isGood = true;
-                }
+                return choosen;
             }
-            else
-            {
-                isGood = true;
-            }
+        }
+        else
+        {
+            return choosen;
         }
         return choosen;
     }

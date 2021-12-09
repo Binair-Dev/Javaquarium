@@ -23,6 +23,11 @@ public class Main {
 
         FileUtils.readConfigFileLineByLine();
 
+        for(int i = 0; i < 15; i++) {
+            System.out.println("Tour " + i);
+            aquarium.AjouterTour();
+        }
+
         boolean isRunning = true;
         Scanner scanner = new Scanner(System.in);
         while(isRunning) {
